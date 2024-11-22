@@ -1,0 +1,121 @@
+Here are scenario-based interview questions and answers related to Amazon EC2 for a 3-year experienced DevOps engineer:
+
+---
+
+### **Q1: Your application is hosted on EC2 instances behind an Application Load Balancer (ALB). Users report intermittent connectivity issues. How would you troubleshoot the issue?**
+
+**Answer:**
+1. **Check ALB health checks:**
+   - Verify that the target group health checks are properly configured.
+   - Ensure health checks are passing for all instances. Adjust the health check configuration if needed (e.g., path, timeout, interval).
+
+2. **Instance status:**
+   - Verify the EC2 instance status checks (both system and instance checks).
+   - Look for resource bottlenecks on the EC2 instances (CPU, memory, disk, etc.) using CloudWatch metrics.
+
+3. **Security groups and network ACLs:**
+   - Ensure that the security group allows traffic from the ALB to the instances.
+   - Check for conflicting rules in network ACLs.
+
+4. **Logs and monitoring:**
+   - Review ALB access logs and CloudWatch metrics for unusual traffic patterns.
+   - Check application logs for errors.
+
+5. **Scaling issues:**
+   - Confirm that auto-scaling is configured properly to handle varying traffic loads.
+   - Adjust scaling policies if needed.
+
+---
+
+### **Q2: You have an EC2 instance running a critical application. The instance has stopped due to an underlying hardware failure. How would you handle this situation?**
+
+**Answer:**
+1. **Identify the failure:**
+   - Check the EC2 instance status in the AWS Management Console to confirm the failure reason.
+
+2. **Launch a replacement instance:**
+   - If you are using an Elastic Load Balancer, traffic would have already been rerouted to healthy instances.
+   - Launch a new EC2 instance from the latest AMI (Amazon Machine Image) or recover from a backup/snapshot.
+
+3. **Attach storage:**
+   - If the failed instance had EBS volumes, detach and reattach the volumes to the new instance.
+
+4. **Update DNS if needed:**
+   - If the instance had a static public IP, update the DNS record with the new instance's IP or associate an Elastic IP with the new instance.
+
+5. **Implement preventive measures:**
+   - Consider enabling EC2 Auto Recovery for similar instances in the future.
+   - Use Auto Scaling groups with a minimum of one instance to ensure availability.
+
+---
+
+### **Q3: How would you configure EC2 instances to automatically install necessary packages and start a service on launch?**
+
+**Answer:**
+1. **Use User Data:**
+   - Add a script in the user data field while launching the EC2 instance. Example for installing Apache and starting the service:
+     ```bash
+     #!/bin/bash
+     yum update -y
+     yum install -y httpd
+     systemctl start httpd
+     systemctl enable httpd
+     ```
+   - For Ubuntu, replace `yum` with `apt`.
+
+2. **Use Configuration Management Tools:**
+   - Use tools like Ansible, Chef, or Puppet for consistent configuration across multiple instances.
+
+3. **Create a Custom AMI:**
+   - Pre-configure an instance with the required packages and services, then create an AMI to launch new instances with the same setup.
+
+---
+
+### **Q4: You notice your EC2 instance’s disk is running out of space. How would you address this issue?**
+
+**Answer:**
+1. **Check Disk Usage:**
+   - Use `df -h` and `du -sh /path` to identify which directories/files are consuming the most space.
+
+2. **Clean Up:**
+   - Remove unnecessary files, logs, or temporary files to free up space.
+
+3. **Expand EBS Volume:**
+   - In the AWS Console:
+     - Stop the instance.
+     - Increase the size of the attached EBS volume.
+     - Restart the instance and resize the file system using `resize2fs` or `xfs_growfs`, depending on the file system.
+
+4. **Enable Log Rotation:**
+   - Configure logrotate to prevent logs from consuming excessive space.
+
+5. **Move to S3:**
+   - Migrate infrequently accessed data or logs to Amazon S3.
+
+---
+
+### **Q5: You are tasked with setting up an Auto Scaling group for your EC2 instances. How would you ensure smooth scaling with minimal downtime?**
+
+**Answer:**
+1. **Define the launch template/configuration:**
+   - Include AMI ID, instance type, security groups, and user data scripts in the launch template.
+
+2. **Set Auto Scaling policies:**
+   - Use metrics like CPU utilization or request count to define scaling policies.
+   - For example, scale out when CPU utilization > 70% and scale in when CPU utilization < 30%.
+
+3. **Configure health checks:**
+   - Enable both EC2 and ALB health checks to ensure unhealthy instances are replaced.
+
+4. **Distribute traffic:**
+   - Use an Application Load Balancer to distribute traffic across instances in the Auto Scaling group.
+
+5. **Test scaling policies:**
+   - Simulate traffic using tools like Apache JMeter or AWS Synthetics to validate scaling behavior.
+
+6. **Use lifecycle hooks:**
+   - Implement lifecycle hooks to perform custom actions (e.g., configuring instances before they enter the InService state).
+
+---
+
+These questions and answers should help you confidently approach EC2-related scenarios in interviews!
