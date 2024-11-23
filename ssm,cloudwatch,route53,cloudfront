@@ -1,0 +1,126 @@
+Here’s a collection of scenario-based and troubleshooting interview questions with sample answers for a 3-year-experienced DevOps engineer. These focus on WAF, CloudFront, Route 53, SSM, and CloudWatch logging on EC2.
+
+---
+
+### **Web Application Firewall (WAF)**
+
+**Q1: You are noticing a high number of suspicious requests on your application. How would you use AWS WAF to mitigate the attack?**
+
+**Answer:**
+- Enable AWS WAF and attach it to the associated CloudFront distribution or Application Load Balancer.
+- Analyze the suspicious requests using AWS WAF logs in Amazon CloudWatch.
+- Create custom rules:
+  - Block specific IP addresses or ranges using IP match conditions.
+  - Block requests with specific patterns in headers, query strings, or URIs using regex match conditions.
+- Use rate-based rules to limit requests from IPs sending high traffic.
+- Test the rules in “Count” mode before switching to “Block” mode to avoid false positives.
+
+---
+
+**Q2: After applying a WAF rule to block malicious traffic, legitimate traffic is getting blocked as well. How do you troubleshoot this?**
+
+**Answer:**
+- Check CloudWatch logs to identify which WAF rule is causing the block.
+- Use the AWS WAF Console to review the rule conditions and metrics (e.g., request count, blocked requests).
+- Test the rule with real traffic in "Count" mode to confirm false positives.
+- Refine the rule logic, such as adjusting regex patterns or excluding trusted IP ranges.
+- Update the WAF rule and monitor traffic again.
+
+---
+
+### **CloudFront**
+
+**Q3: Users are experiencing delays when accessing a CloudFront-distributed application. How do you troubleshoot the latency issue?**
+
+**Answer:**
+- Confirm the issue is specific to CloudFront by comparing latency with and without CloudFront (using the origin endpoint).
+- Check the CloudFront distribution settings:
+  - Ensure caching behavior is optimized (e.g., TTL settings are appropriate).
+  - Use Lambda@Edge to remove unnecessary headers and reduce payload size.
+- Verify origin server health and latency using CloudWatch metrics and AWS Health Dashboard.
+- Enable logging in CloudFront and analyze access logs in S3 to identify regional patterns.
+- Test the nearest edge location using AWS CloudFront Regional Edge Cache or CDN testing tools.
+
+---
+
+**Q4: A file updated in S3 is not reflecting on CloudFront. How do you resolve this?**
+
+**Answer:**
+- Invalidate the CloudFront cache for the specific file using the invalidation feature in the AWS Management Console or CLI.
+- Check if the updated file has the correct permissions in the S3 bucket (public read access or appropriate bucket policy).
+- Ensure versioning is handled correctly if the same file key is reused.
+
+---
+
+### **Route 53**
+
+**Q5: A domain hosted on Route 53 is not resolving correctly for some users. How do you troubleshoot?**
+
+**Answer:**
+- Verify the DNS records in the Route 53 console and ensure they are correctly configured (A/AAAA/CNAME records pointing to the right targets).
+- Check the health checks configured in Route 53; unhealthy checks may cause failovers or disruptions.
+- Use tools like `dig` or `nslookup` to confirm DNS resolution from different locations.
+- Verify TTL settings and ensure recent changes have propagated.
+- Use AWS Route 53 DNS query logs to investigate patterns of failing queries.
+
+---
+
+**Q6: You’ve set up a multi-region failover using Route 53, but failover isn’t occurring as expected. What steps would you take?**
+
+**Answer:**
+- Confirm health checks are enabled and associated with the failover record sets.
+- Check if the health check endpoints are reachable and return the expected response.
+- Validate that the record sets are properly marked as “Primary” and “Failover” in the Route 53 console.
+- Test the failover manually by simulating a health check failure and monitoring DNS response changes.
+
+---
+
+### **Systems Manager (SSM)**
+
+**Q7: You are unable to connect to an EC2 instance using SSM Session Manager. How do you troubleshoot?**
+
+**Answer:**
+- Verify that the SSM Agent is installed and running on the EC2 instance.
+- Ensure the EC2 instance has the required IAM role attached with `AmazonSSMFullAccess` or appropriate permissions.
+- Confirm connectivity between the EC2 instance and AWS Systems Manager endpoints.
+- Check SSM logs located at `/var/log/amazon/ssm/` for errors.
+- Verify that the Session Manager feature is enabled in the Systems Manager console.
+
+---
+
+**Q8: Patch Manager is not applying patches to your EC2 instance. What steps do you take to troubleshoot?**
+
+**Answer:**
+- Confirm the Patch Baseline is assigned and configured correctly.
+- Check if the EC2 instance is tagged to match the patching target group.
+- Verify the instance has the correct IAM role with `AmazonSSMFullAccess` or patch-specific policies.
+- Review the SSM Agent logs on the EC2 instance for errors.
+- Check the compliance reports in SSM to identify any specific patch failures.
+
+---
+
+### **CloudWatch Logging on EC2**
+
+**Q9: CloudWatch logs are not appearing for your application running on an EC2 instance. How do you troubleshoot this?**
+
+**Answer:**
+- Verify that the CloudWatch Agent is installed and running on the EC2 instance.
+- Check the CloudWatch Agent configuration file (`/opt/aws/amazon-cloudwatch-agent/bin/config.json`) for correctness.
+- Ensure the IAM role attached to the EC2 instance has `CloudWatchLogsFullAccess` or equivalent permissions.
+- Review agent logs at `/var/log/amazon-cloudwatch-agent/` for any errors.
+- Confirm that the EC2 instance can reach the CloudWatch service endpoint.
+
+---
+
+**Q10: Your CloudWatch logs indicate high memory usage on an EC2 instance. How do you respond?**
+
+**Answer:**
+- Use the CloudWatch Metrics to identify processes consuming high memory (using a custom metric or built-in metrics if enabled).
+- SSH into the instance and use tools like `top`, `htop`, or `free` to validate memory usage.
+- Analyze application logs for memory leaks or misconfigurations.
+- Scale the instance vertically (increase instance type) or horizontally (add more instances) if necessary.
+- Implement memory limits at the application level if applicable.
+
+---
+
+Feel free to modify these responses or ask for more tailored scenarios!
